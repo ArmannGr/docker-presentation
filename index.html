@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/moon.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-background-image="./img/blog-docker.png">
+				</section>
+
+				<section>
+					<h3>Ziel</h3>
+					<ul>
+						<li>Konzept hinter Docker verstehen</li>
+						<li>Einsatzmöglichkeiten erkennen</li>
+						<li>Hands-On nachvollziehen können</li>
+					</ul>
+				</section>
+				  <section>
+					Was ist ein Container ?
+					<img src="./img/what-is-docker-container.png">
+					<aside class="notes">
+						Was ist ein Container?
+						<br>
+					
+						<ul>
+							<li>
+								Isolierte Sandbox auf euerem Rechner
+							</li>
+							<li>
+								Ist eine ausführbare Insatnz eines Images
+							</li>
+							<li>
+								Es kann auf der lokalen oder auf eine virtuellen Machine laufen als auch in der Cloud deployed werden  
+							</li>
+							<li>
+								läuft auf jedem Betribessystem
+							</li>
+							<li>
+								ist komplett isoliert von anderen Containern ( eigene Software binaries und configurations)
+							</li>
+						</ul>
+					  </aside>
+			  </section>
+				  <section>
+					Was ist ein Container Image ?
+					<img src="./img/image-blog-docker-containers.jpg">
+					<aside class="notes">
+						<ul>
+							<li>
+								Image beinhaltet eigenes Dateisystem und alles was man nbenötigt um eine Applikation zum laufen zu bringen
+								all dependencies, configurations, scripts, binaries, etc.
+							</li>
+							<li>
+								Beinhalten auch configurations wie environment variables und metadaten 
+							</li>
+							<li>Bauplan von dem Container</li>
+						</ul>
+					  </aside>
+				  </section>
+				  <section>
+					Was ist also Docker ?
+					<img src="./img/docker-archticture.png">
+					<aside class="notes">
+						<ul>
+							<li>
+								Virtualisierungsoftware
+							</li>
+							<li>
+								macht das entwicklen und das bereitstellen von Applikation deutlich einfacher
+							</li>
+							<li>
+								Verpackt alle nötigen Ressourcen und configurationen in eine Container
+							</li>
+							<li>
+								Ein Container ist eine Standertisierte Einheit, welches alles beinhaltet, was eine Applikation benötigt um zu laufen
+							</li>
+							<li>
+								Es ist Portierbar und einfach zu teilen 
+							</li>
+						</ul>
+					</aside>
+				  </section>
+				  <section>
+					Warum brauchen wir das?
+					<img src="./img/Why-Should-You-Use-Docker-7-Major-Reasons.png">
+					<aside class="notes">
+						<ul>
+							<li>Einrichten einer Development Umgebung</li>
+						</ul>
+						<ul>
+							<li>Installation und Configuration durch Docker übernommen
+								einfacheres Deployment
+							</li>
+						</ul>
+					</aside>
+				  </section>
+				  <section>
+					Virtuelle Maschine vs Docker Container
+					<img src="./img/containers-vs-virtual-machines.jpg">
+					<aside class="notes">
+						<ul>
+							<li>
+								Virtuelle Maschine muss eigens Betribesystem haben 
+							</li>
+							<li>
+								Docker emuliert das Betribessystem
+							</li>
+							<li>
+								Docker images haben wenige MBs
+								VM images haben ein GBs
+							</li>
+							<li>
+								Docker Container laufen in sekunden 
+								VMs laufen in minuten
+							</li>
+						</ul> 
+					</aside>
+				  </section>
+				  <section>
+					Unser Einsatz von Docker
+					<section><img src="./img/Gitlab.png"></section>
+					<section><img src="./img/Kubernetes-logo.webp"></section>
+					<aside class="notes">
+						<ul>
+							<li>Pipelining, was von Nils präsentiert wurde</li>
+							<li>Im Kubernetes CLuster, werden Docker Container Deployed</li>
+							<li>loaklen Development umgebung</li>
+						</ul>
+					</aside>
+				  </section>
+				  <section>
+						Hands-On
+						<section>
+							Containerisieren einer Applikation
+							<pre>
+								Dockerfile
+								<code>
+									FROM node:18-alpine
+									WORKDIR /app
+									COPY . .
+									RUN yarn install --production
+									CMD ["node", "src/index.js"]
+									EXPOSE 3000
+								</code>
+							</pre>
+							<aside class="notes">
+								<ul>
+									<li>FROM - Spezifiziert das Base Image </li>
+									<li>WORKDIR - Das ist der Pfad der gesetzt wird, der die folgenden Commands ausführt</li>
+									<li>COPY - kopiert Dateien und Directories in den Container</li>
+									<li>RUN - installieren von packages in den Container</li>
+									<li>CMD - beinhaltet argumente für den auszuführenden Container</li>
+									<li>EXPOSE - spezifiziert den Port</li>
+								</ul>
+							</aside>
+						</section>
+						<section>
+							<p class="r-fit-text">Applikationen Teilen</p> 
+							<ul>
+								<li>Docker Container Registry</li>
+								<li>Gitlab Container Registry</li>
+							</ul>
+						</section>
+						<section>
+							Benutzen von Docker Compose
+							<pre>
+								docker-compose.yml
+								<code>
+									version: "3.7"
+
+									services:
+									db:
+										image: library/postgres:latest
+										container_name: educationSchedulerDB
+										environment:
+										POSTGRES_PASSWORD: password
+										POSTGRES_USER: educationScheduler
+										POSTGRES_DB: educationScheduler
+										networks:
+										- educationScheduler
+										ports:
+										- 32780:5432
+										volumes:
+										- "educationSchedulerDB:/var/lib/postgresql/data"
+
+									networks:
+									educationScheduler:
+
+									volumes:
+									educationSchedulerDB:
+								</code>
+							</pre>
+						</section>
+				  </section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealNotes ],
+			});
+		</script>
+	</body>
+</html>
